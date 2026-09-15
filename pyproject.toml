@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rag-audit"
+version = "0.1.0"
+description = "Fast, local, zero-setup visual dashboard for RAG evaluation and hallucination debugging."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "typer[all]>=0.12.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.30.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+rag-audit = "rag_audit.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag_audit"]
+
+# Obliga a hatchling a empaquetar el frontend estático compilado
+[tool.hatch.build.targets.wheel.force-include]
+"src/rag_audit/web/dist" = "rag_audit/web/dist"
