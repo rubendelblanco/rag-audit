@@ -8,7 +8,7 @@ from rag_audit.models import AuditDataset
 
 app = FastAPI(title="RAG-Audit API")
 
-# Permitir CORS para cuando desarrollas el frontend localmente con Vite (puerto 5173)
+# Allow CORS for local frontend development with Vite (port 5173)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,7 +32,7 @@ async def get_report():
     return CURRENT_DATASET
 
 
-# Servir la interfaz SPA
+# Serve the SPA
 dist_dir = Path(__file__).resolve().parent / "web" / "dist"
 
 if dist_dir.exists():

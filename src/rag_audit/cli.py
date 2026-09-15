@@ -1,6 +1,5 @@
 import json
 import threading
-import time
 import webbrowser
 from pathlib import Path
 from typing import Optional
@@ -10,29 +9,25 @@ import uvicorn
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from rag_audit.models import AuditDataset, RAGItem, EvaluationMetrics
+from rag_audit.evaluators import Evaluator, get_evaluator
+from rag_audit.models import AuditDataset, RAGItem
 from rag_audit.server import app as fastapi_app, set_dataset
 
 console = Console()
 app = typer.Typer(
-    help="RAG-Audit: Inspecciona y depura alucinaciones de tus RAGs localmente."
+    help="RAG-Audit: Inspect and debug hallucinations in your RAGs, locally."
 )
 
 
-def compute_metrics_placeholder(items: list[RAGItem]) -> AuditDataset:
-    """Calcula o rellena métricas mockeando la lógica de evaluación."""
+def compute_metrics(items: list[RAGItem], evaluator: Evaluator) -> AuditDataset:
+    """Evaluate each item with the given evaluator and aggregate dataset metrics."""
     processed = []
     faith_accum = 0.0
     rel_accum = 0.0
 
     for item in items:
         if not item.metrics:
-            # Aquí irá la llamada al LLM evaluador (Ollama/OpenAI)
-            item.metrics = EvaluationMetrics(
-                faithfulness=0.45,
-                answer_relevance=0.85,
-                reasoning="El contexto menciona el puerto 80, pero el modelo respondió 8080.",
-            )
+            item.metrics = evaluator.evaluate(item)
         faith_accum += item.metrics.faithfulness
         rel_accum += item.metrics.answer_relevance
         processed.append(item)
@@ -54,55 +49,60 @@ def view(
         file_okay=True,
         dir_okay=False,
         readable=True,
-        help="Ruta al JSON con tus predicciones de RAG",
+        help="Path to the JSON file with your RAG predictions",
     ),
     port: int = typer.Option(
-        8844, "--port", "-p", help="Puerto local para el dashboard"
+        8844, "--port", "-p", help="Local port for the dashboard"
     ),
     model: str = typer.Option(
         "ollama/llama3.2",
         "--model",
         "-m",
-        help="Modelo evaluador (ej: ollama/llama3.2 o gpt-4o-mini)",
+        help="Evaluator model (e.g. ollama/llama3.2 or gpt-4o-mini)",
     ),
     no_browser: bool = typer.Option(
-        False, "--no-browser", help="No abrir automáticamente el navegador"
+        False, "--no-browser", help="Don't open the browser automatically"
     ),
 ):
-    """Carga un dataset, evalúa las métricas y levanta el dashboard visual."""
+    """Load a dataset, evaluate its metrics, and launch the visual dashboard."""
     console.print(
-        f"\n[bold green]RAG-Audit[/bold green] - Analizando [cyan]{file_path.name}[/cyan]...\n"
+        f"\n[bold green]RAG-Audit[/bold green] - Analyzing [cyan]{file_path.name}[/cyan]...\n"
     )
 
-    # 1. Leer archivo
+    # 1. Read the file
     with open(file_path, "r", encoding="utf-8") as f:
         raw_data = json.load(f)
 
     items = [RAGItem(**item) for item in raw_data]
 
-    # 2. Evaluación con feedback visual en consola
+    try:
+        evaluator = get_evaluator(model)
+    except ValueError as exc:
+        console.print(f"[bold red]✗[/bold red] {exc}")
+        raise typer.Exit(code=1)
+
+    # 2. Evaluate with visual console feedback
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         transient=True,
     ) as progress:
         progress.add_task(
-            description=f"Evaluando con [bold]{model}[/bold]...", total=None
+            description=f"Evaluating with [bold]{model}[/bold]...", total=None
         )
-        time.sleep(1)  # Simulación
-        dataset = compute_metrics_placeholder(items)
+        dataset = compute_metrics(items, evaluator)
 
     set_dataset(dataset)
 
     url = f"http://127.0.0.1:{port}"
-    console.print(f"[bold green]✓[/bold green] Auditoría completada ({dataset.total_queries} queries procesadas).")
-    console.print(f"[bold blue]→ Dashboard listo en:[/bold blue] [link={url}]{url}[/link]\n")
+    console.print(f"[bold green]✓[/bold green] Audit complete ({dataset.total_queries} queries processed).")
+    console.print(f"[bold blue]→ Dashboard ready at:[/bold blue] [link={url}]{url}[/link]\n")
 
-    # 3. Lanzar navegador en segundo plano
+    # 3. Launch the browser in the background
     if not no_browser:
         threading.Timer(0.8, lambda: webbrowser.open(url)).start()
 
-    # 4. Servidor Uvicorn
+    # 4. Uvicorn server
     uvicorn.run(fastapi_app, host="127.0.0.1", port=port, log_level="warning")
 
 

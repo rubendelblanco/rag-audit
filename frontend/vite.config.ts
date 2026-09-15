@@ -9,7 +9,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    // Para desarrollar el front suelto proxyando la API de Python
+    // For standalone frontend dev, proxy the Python API
     proxy: {
       '/api': 'http://127.0.0.1:8844',
     },

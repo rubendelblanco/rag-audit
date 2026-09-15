@@ -14,6 +14,7 @@ dependencies = [
     "uvicorn>=0.30.0",
     "pydantic>=2.0.0",
     "rich>=13.0.0",
+    "ollama>=0.6.2",
 ]
 
 [project.scripts]
@@ -22,6 +23,6 @@ rag-audit = "rag_audit.cli:app"
 [tool.hatch.build.targets.wheel]
 packages = ["src/rag_audit"]
 
-# Obliga a hatchling a empaquetar el frontend estático compilado
+# Force hatchling to package the compiled static frontend
 [tool.hatch.build.targets.wheel.force-include]
 "src/rag_audit/web/dist" = "rag_audit/web/dist"
