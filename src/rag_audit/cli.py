@@ -1,4 +1,5 @@
 import json
+import sys
 import threading
 import webbrowser
 from pathlib import Path
@@ -12,6 +13,13 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rag_audit.evaluators import Evaluator, get_evaluator
 from rag_audit.models import AuditDataset, RAGItem
 from rag_audit.server import app as fastapi_app, set_dataset
+
+# Some Windows terminals default to a legacy codepage (e.g. cp1252) that
+# can't encode the checkmarks/arrows we print below; force UTF-8 so output
+# never crashes regardless of the host console's configured codepage.
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 console = Console()
 app = typer.Typer(
