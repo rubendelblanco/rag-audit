@@ -41,6 +41,18 @@ is one of the main peaks of the Himalayan range", extract the single claim \
 since that loses the actual relationship being asserted and each fragment \
 alone can look true even when the real claim is false.
 
+Write each claim in the same language as the Response — do not translate \
+it — and preserve its exact meaning; do not paraphrase into different \
+wording that could change what is actually being asserted (e.g. turning an \
+assertion that something FELL or HAPPENED in a year into one that it is \
+LOCATED in that year changes the meaning).
+
+The Response usually asserts more than one fact — extract ALL of them, not \
+just the first. For example, given "El puente se inauguró en 1937 y su \
+torre alcanza 227 metros de altura", extract two separate claims, each in \
+the original language: one about when the bridge opened, and one about the \
+tower's height — do not stop after the first fact.
+
 Respond only with JSON matching the required schema."""
 
 
@@ -61,7 +73,11 @@ class ExtractionResult(BaseModel):
     )
     statements: List[str] = Field(
         default_factory=list,
-        description="Atomic factual claims found in the Response text, and nothing else. Leave empty when is_abstention is true.",
+        description=(
+            "Atomic factual claims found in the Response text, and nothing else, "
+            "in the same language as the Response and without changing their "
+            "meaning. Leave empty when is_abstention is true."
+        ),
     )
 
 
