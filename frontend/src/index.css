@@ -1,0 +1,241 @@
+:root {
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --border: #e3e3ec;
+  --text: #1a1a2e;
+  --text-muted: #6b6b80;
+  --accent: #4f46e5;
+  --good-bg: #e6f6ec;
+  --good-text: #1a7f4e;
+  --warn-bg: #fff6e0;
+  --warn-text: #966400;
+  --bad-bg: #fdeaea;
+  --bad-text: #c62d2d;
+  --neutral-bg: #eef0ff;
+  --neutral-text: #4a4ab0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16161f;
+    --surface: #1f1f2b;
+    --border: #2f2f40;
+    --text: #f0f0f5;
+    --text-muted: #a0a0b8;
+    --good-bg: #123524;
+    --good-text: #4ade80;
+    --warn-bg: #3a2e0a;
+    --warn-text: #facc15;
+    --bad-bg: #3a1414;
+    --bad-text: #f87171;
+    --neutral-bg: #23233a;
+    --neutral-text: #a5a5f0;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.app-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-muted);
+}
+
+.app-header h1 {
+  margin: 0 0 1.25rem;
+  font-size: 1.75rem;
+}
+
+.stats-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  flex: 1 1 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.stat-good .stat-value {
+  color: var(--good-text);
+}
+.stat-warn .stat-value {
+  color: var(--warn-text);
+}
+.stat-bad .stat-value {
+  color: var(--bad-text);
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.item-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+
+.item-question {
+  font-weight: 600;
+  flex: 1;
+}
+
+.item-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.item-chevron {
+  color: var(--text-muted);
+  width: 1rem;
+  text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-good {
+  background: var(--good-bg);
+  color: var(--good-text);
+}
+.badge-warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.badge-bad {
+  background: var(--bad-bg);
+  color: var(--bad-text);
+}
+.badge-neutral {
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+}
+
+.item-body {
+  padding: 0 1.1rem 1.1rem;
+  border-top: 1px solid var(--border);
+}
+
+.item-body h4 {
+  margin: 1rem 0 0.35rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.item-body p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.context-block {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.claims-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.claims-list li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.claim-supported {
+  background: var(--good-bg);
+}
+.claim-unsupported {
+  background: var(--bad-bg);
+}
+
+.claim-icon {
+  font-weight: 700;
+}
+
+.claim-supported .claim-icon {
+  color: var(--good-text);
+}
+.claim-unsupported .claim-icon {
+  color: var(--bad-text);
+}
+
+.claim-statement {
+  font-weight: 600;
+}
+
+.claim-reason {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
