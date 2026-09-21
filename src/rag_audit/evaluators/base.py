@@ -79,12 +79,25 @@ def _extraction_prompt(item: RAGItem) -> str:
 VERIFICATION_SYSTEM_PROMPT = """You are a strict fact-checker. Given a Context and a single Claim, decide \
 whether the Context logically supports the Claim.
 
-First, explicitly check: is the Claim a word-for-word match, a trivial \
-unit/format conversion (e.g. "5000 ms" = "5 s", "1000 MB" = "1 GB"), or a \
-direct synonym (e.g. "rollback" = "revert the change") of something stated \
-in the Context? Such conversions and synonyms always count as supported — \
-never penalize rephrasing or unit conversion as unsupported. Then set \
-supported based on that check.
+First, explicitly check these cases:
+
+1. Membership, not exclusivity: if the Claim says something IS one of several \
+things listed in the Context (e.g. the Claim is "X is made of A" and the \
+Context lists "A, B and C"), that is supported — the Context does not need to \
+say A is the ONLY one. Only treat it as unsupported on these grounds if the \
+Claim itself asserts exclusivity ("only", "exclusively", "solely", etc.) and \
+the Context contradicts that.
+
+2. Unit/format conversions always count as supported, including ones that \
+need addition or a formula, not just multiplication or relabeling (e.g. \
+"5000 ms" = "5 s", "1000 MB" = "1 GB", and just as much "100 °C" = "373.15 K" \
+or any other exact conversion between measurement scales) — never reject a \
+conversion just because the Context does not use the same unit name.
+
+3. Direct synonyms (e.g. "rollback" = "revert the change") of something \
+stated in the Context also count as supported.
+
+Then set supported based on that check.
 
 Respond only with JSON matching the required schema."""
 
@@ -97,9 +110,11 @@ class ClaimVerdict(BaseModel):
     reason: str = Field(
         ...,
         description=(
-            "First check whether the claim is a word-for-word match, a trivial "
-            "unit/format conversion, or a direct synonym of something in the "
-            "context. Then give a one-sentence justification for the verdict below."
+            "First check whether the claim is a word-for-word match, a member of a "
+            "list without needing to be the only one, a unit/format conversion "
+            "(including ones needing addition or a formula), or a direct synonym "
+            "of something in the context. Then give a one-sentence justification "
+            "for the verdict below."
         ),
     )
     supported: bool = Field(
