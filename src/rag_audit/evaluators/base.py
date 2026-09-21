@@ -31,6 +31,16 @@ factual claims the Response makes. Do not include any fact that comes from \
 anywhere else — only what this Response actually says. When is_abstention is \
 true, leave statements empty.
 
+A claim that links an entity to a category, membership, location, or \
+ownership (e.g. "X belongs to Y", "X is part of Y", "X is located in Y") is \
+ONE claim about that relationship — never split the entity from what is \
+being asserted about it. For example, given the sentence "Mount Kilimanjaro \
+is one of the main peaks of the Himalayan range", extract the single claim \
+"Mount Kilimanjaro is part of the Himalayan range" — do NOT split it into \
+"Mount Kilimanjaro is a main peak" and "the Himalayas are a mountain range", \
+since that loses the actual relationship being asserted and each fragment \
+alone can look true even when the real claim is false.
+
 Respond only with JSON matching the required schema."""
 
 
