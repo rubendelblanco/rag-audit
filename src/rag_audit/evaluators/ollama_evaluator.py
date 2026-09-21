@@ -1,7 +1,12 @@
-import ollama
+from typing import Type, TypeVar
 
-from rag_audit.evaluators.base import SYSTEM_PROMPT, Evaluator, build_user_prompt
+import ollama
+from pydantic import BaseModel
+
+from rag_audit.evaluators.base import Evaluator, run_evaluation
 from rag_audit.models import EvaluationMetrics, RAGItem
+
+M = TypeVar("M", bound=BaseModel)
 
 
 class OllamaEvaluator(Evaluator):
@@ -10,14 +15,17 @@ class OllamaEvaluator(Evaluator):
     def __init__(self, model: str):
         self.model = model
 
-    def evaluate(self, item: RAGItem) -> EvaluationMetrics:
+    def _chat_json(self, system: str, user: str, schema: Type[M]) -> M:
         response = ollama.chat(
             model=self.model,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": build_user_prompt(item)},
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
             ],
-            format=EvaluationMetrics.model_json_schema(),
+            format=schema.model_json_schema(),
             options={"temperature": 0},
         )
-        return EvaluationMetrics.model_validate_json(response["message"]["content"])
+        return schema.model_validate_json(response["message"]["content"])
+
+    def evaluate(self, item: RAGItem) -> EvaluationMetrics:
+        return run_evaluation(self._chat_json, item)
