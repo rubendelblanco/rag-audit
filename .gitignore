@@ -16,6 +16,9 @@ node_modules/
 frontend/dist/
 src/rag_audit/web/dist/
 
+# Ad-hoc test datasets dropped at the repo root during manual evaluation
+/gemini-code-*.json
+
 # Editors / OS
 .vscode/
 .idea/
